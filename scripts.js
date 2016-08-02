@@ -1,5 +1,23 @@
 $(document).ready(function(){
 
+    function saveObj(obj){
+        console.log(obj);
+        console.log('#save'+obj.Symbol)
+        $('#save' + obj.Symbol).on("click", function() {
+            localStorage.setItem(obj.Symbol, JSON.stringify(obj));
+        });
+    }
+
+    function deleteObj(obj){
+        console.dir(obj);
+        $('#delete' + obj.Symbol).on("click", function() {
+            localStorage.removeItem(obj.Symbol, JSON.stringify(obj));
+            $('row' + obj.Symbol).remove();
+
+        });
+    }
+
+
     $('.yahoo-form').submit(function(){
         event.preventDefault();
         var symbol = $('#symbol').val();
@@ -13,30 +31,23 @@ $(document).ready(function(){
             if (stockCount > 1){
                 for (var i = 0; i < stockInfo.length; i++) {
                     newHTML += buildNewTable(stockInfo[i]).html;
-                    $(newHTML).load(function(){
-                        saveObj(stockInfo[i]);
-                        deleteObj(stockInfo[i]);
-                    });
+                    $('.yahoo-body').html(newHTML);
+                    saveObj(stockInfo[i]);
+                    deleteObj(stockInfo[i]);
                 } 
             }else{
                 newHTML += buildNewTable(stockInfo).html;
-                $(newHTML).load(function(){
-                    saveObj(stockInfo);
-                    deleteObj(stockInfo);
-                });
+                $('.yahoo-body').html(newHTML);
+                saveObj(stockInfo);
+                deleteObj(stockInfo);
             }
-            $('.yahoo-body').html(newHTML);
-            $('.table').DataTable({
-                buttons: [
-                    {extend: 'create', editor: myEditor},
-                    {extend: 'edit', editor: myEditor},
-                    {extend: 'remove', editor: myEditor}
-                ]
-            });
+            $('.table').DataTable();
+            
        });
     });
 
 });
+
 
 
 function buildNewTable(stockInfo){
@@ -47,28 +58,13 @@ function buildNewTable(stockInfo){
     }
     var stockStuff = {};
     var htmlString = '';
-    htmlString = '<tr id="row'+stockInfo.Name+'"><td>' + stockInfo.Symbol + '</td>';
+    htmlString = '<tr id="row'+stockInfo.Symbol+'"><td>' + stockInfo.Symbol + '</td>';
     htmlString += '<td>' + stockInfo.Name + '</td>';
     htmlString += '<td>' + stockInfo.Ask + '</td>';
     htmlString += '<td>' + stockInfo.Bid + '</td>';
     htmlString += '<td class="'+upDown+'">' + stockInfo.Change + '</td>';
-    htmlString += '<td>' + '<button id="save' + stockInfo.Name + '" class="btn btn-warning">Save</button><button type="button" id="save' + stockInfo.Name + '" class="btn btn-danger">Delete</button></td></tr>';
+    htmlString += '<td>' + '<button id="save' + stockInfo.Symbol + '" class="btn btn-warning">Save</button><button type="button" id="delete' + stockInfo.Symbol + '" class="btn btn-danger">Delete</button></td></tr>';
     stockStuff.html = htmlString;
     stockStuff.object = stockInfo;
     return stockStuff;
-}
-
-function saveObj(obj){
-    console.log(obj);
-    $('#save' + obj.Name).on('click', function(){
-        localStorage.setItem(obj.Name, JSON.stringify(obj));
-    });
-}
-
-function deleteObj(obj){
-    console.log(obj);
-    $('#delete' + obj.Name).on('click', function(){
-        $('#row' + obj.Name).remove();
-        localStorage.removeItem(obj.Name);
-    });
 }
