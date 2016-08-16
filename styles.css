@@ -5,3 +5,7 @@
 .down{
     color: red;
 }
+
+.watchlist-wrapper{
+    display: none;
+}
